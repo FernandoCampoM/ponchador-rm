@@ -20,6 +20,50 @@ if (-not $isAdmin) {
     exit 1
 }
 
+# 1. Configuración de Seguridad Total (TLS 1.2 y 1.3)
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13
+
+# 2. Definir versión CORRECTA (20.18.1)
+$version = "v20.19.6"
+$url = "https://nodejs.org/dist/$version/node-$version-x64.msi"
+$installerPath = Join-Path $env:TEMP "nodejs_installer.msi"
+
+Write-Host "--- Iniciando Instalación de Node.js $version ---" -ForegroundColor Cyan
+
+try {
+    # 3. Descarga robusta
+    Write-Host "[1/3] Descargando instalador..." -ForegroundColor Yellow
+    $webClient = New-Object System.Net.WebClient
+    $webClient.DownloadFile($url, $installerPath)
+    
+    # 4. Instalación silenciosa
+    Write-Host "[2/3] Ejecutando instalador (esto puede tardar un minuto)..." -ForegroundColor Yellow
+    $process = Start-Process msiexec.exe -ArgumentList "/i `"$installerPath`" /qn /norestart" -Wait -PassThru
+    
+    if ($process.ExitCode -eq 0) {
+        Write-Host "[3/3] ¡Éxito! Node.js se instaló correctamente." -ForegroundColor Green
+    } else {
+        Write-Host "[!] Error: El instalador devolvió el código $($process.ExitCode). Prueba ejecutar como Administrador." -ForegroundColor Red
+    }
+}
+catch {
+    Write-Host "[!] ERROR CRÍTICO: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "Verifica que tengas conexión a internet y que el archivo $url sea accesible." -ForegroundColor Gray
+}
+finally {
+    if (Test-Path $installerPath) { Remove-Item $installerPath -Force }
+}
+
+# 5. Refrescar el entorno para que 'node' funcione de inmediato
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+# Verificar final
+if (Get-Command node -ErrorAction SilentlyContinue) {
+    Write-Host "Versión detectada: $(node -v)" -ForegroundColor Green
+} else {
+    Write-Host "Node aún no es reconocido. Por favor, cierra y abre esta terminal." -ForegroundColor Yellow
+}
+
 # Check for Node.js
 Write-Host "[1/8] Checking for Node.js..." -ForegroundColor Yellow
 try {
@@ -43,6 +87,20 @@ Set-Location $scriptPath
 Write-Host ""
 Write-Host "[2/8] Installing server dependencies y configuración de certificados..." -ForegroundColor Yellow
 Set-Location "server"
+Write-Host "Verificando Chocolatey..." -ForegroundColor Cyan
+
+# 1. Instalar Chocolatey si no existe
+if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
+    Write-Host "Chocolatey no encontrado. Instalando..." -ForegroundColor Yellow
+    Set-ExecutionPolicy Bypass -Scope Process -Force
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+    
+    # Comando oficial de instalación de Chocolatey
+    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+    
+    # Refrescar el PATH para que reconozca 'choco' de inmediato sin cerrar la consola
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+}
 npm install
 choco install mkcert
 mkcert -install
@@ -217,7 +275,7 @@ Write-Host "  - TimeClockServer (Puerto 3000)" -ForegroundColor White
 Write-Host "  - TimeClockClient (Puerto 444)" -ForegroundColor White
 Write-Host ""
 Write-Host "Acceda a la aplicación en:" -ForegroundColor White
-Write-Host "  http://$($localIp):444" -ForegroundColor Cyan
+Write-Host "  https://$($localIp):444" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Los servicios se iniciarán automáticamente con Windows." -ForegroundColor White
 Write-Host "Reglas de firewall configuradas para acceso remoto." -ForegroundColor White

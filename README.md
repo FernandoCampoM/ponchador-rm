@@ -17,8 +17,7 @@ A professional time clock system for Retail Manager that allows employees to clo
    ```
 
 3. **Access the application**:
-   - Local: http://localhost:5173
-   - Network: http://[SERVER-IP]:5173
+   - Network: https://[SERVER-IP]:444
 
 The installer will:
 - ✅ Install all dependencies
@@ -52,7 +51,7 @@ powershell -ExecutionPolicy Bypass -File uninstall.ps1
 ## 🔧 Services
 
 - **TimeClockServer** - Backend API (port 3000)
-- **TimeClockClient** - Frontend interface (port 5173)
+- **TimeClockClient** - Frontend interface (port 444)
 
 Both services:
 - Start automatically on system boot
@@ -74,7 +73,7 @@ See [INSTALLATION.md](INSTALLATION.md) for detailed installation instructions, t
 
 The installer automatically creates firewall rules:
 - **TimeClockServer**: TCP port 3000 (inbound)
-- **TimeClockClient**: TCP port 5173 (inbound)
+- **TimeClockClient**: TCP port 444 (inbound)
 
 ## 🛠️ Development Mode
 

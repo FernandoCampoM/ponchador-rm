@@ -16,22 +16,31 @@ const svc = new Service({
   ]
 });
 
+// Evento: Cuando se completa la instalación
 svc.on('install', () => {
-  console.log('✅ TimeClockClient installed');
+  console.log('✅ TimeClockClient instalado correctamente.');
   svc.start();
 });
 
+// Evento: Cuando se completa la desinstalación (importante para reinstalar)
+svc.on('uninstall', () => {
+  console.log('🗑️ Desinstalación completa. Procediendo a reinstalar...');
+  svc.install();
+});
+
+// Evento: Si ya existe, primero desinstalamos
 svc.on('alreadyinstalled', () => {
-  console.log('ℹ️ Service already installed');
+  console.log('ℹ️ El servicio ya existe. Limpiando versión anterior...');
+  svc.uninstall(); // Esto disparará el evento 'uninstall' arriba cuando termine
 });
 
 svc.on('start', () => {
-  console.log('🚀 TimeClockClient started on port 444');
+  console.log('🚀 TimeClockClient iniciado en el puerto 444');
 });
 
 svc.on('error', (err) => {
-  console.error('❌ Service error:', err);
+  console.error('❌ Error en el servicio:', err);
 });
 
-console.log('Installing TimeClockClient service...');
+console.log('Iniciando proceso de instalación de TimeClockClient...');
 svc.install();
