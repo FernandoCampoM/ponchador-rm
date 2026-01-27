@@ -1,0 +1,16 @@
+2026-01-27 11:59:47 - Starting C:\nodejs\node.exe  --harmony --max_old_space_size=4096 "D:\Trabajo\Ponchador\ponchador-service\PONCHADOR RM\server\node_modules\node-windows\lib\wrapper.js" --file "D:\Trabajo\Ponchador\ponchador-service\PONCHADOR RM\server\index.js" --scriptoptions= --log "TimeClockServer wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
+2026-01-27 11:59:48 - Started 16840
+2026-01-27 12:08:13 - Stopping timeclockserver.exe
+2026-01-27 12:08:13 - ProcessKill 16840
+2026-01-27 12:08:13 - Found child process: 12600 Name: conhost.exe
+2026-01-27 12:08:13 - Found child process: 28144 Name: node.exe
+2026-01-27 12:08:14 - Stopping process 12600
+2026-01-27 12:08:14 - Send SIGINT 12600
+2026-01-27 12:08:14 - SIGINT to 12600 failed - Killing as fallback
+2026-01-27 12:08:14 - Stopping process 28144
+2026-01-27 12:08:14 - Send SIGINT 28144
+2026-01-27 12:08:14 - SIGINT to 28144 failed - Killing as fallback
+2026-01-27 12:08:14 - Stopping process 16840
+2026-01-27 12:08:14 - Send SIGINT 16840
+2026-01-27 12:08:14 - SIGINT to 16840 failed - Killing as fallback
+2026-01-27 12:08:14 - Finished timeclockserver.exe
