@@ -279,7 +279,10 @@ Write-Host "  - TimeClockServer (Puerto 3000)" -ForegroundColor White
 Write-Host "  - TimeClockClient (Puerto 444)" -ForegroundColor White
 Write-Host ""
 Write-Host "Acceda a la aplicación en:" -ForegroundColor White
-Write-Host "  https://$($localIp):444" -ForegroundColor Cyan
+Write-Host "Acceda a la aplicación en cualquiera de estas rutas:" -ForegroundColor White
+foreach ($ip in $listaIPs) {
+    Write-Host "  - https://$($ip):444" -ForegroundColor Cyan
+}
 Write-Host ""
 Write-Host "Los servicios se iniciarán automáticamente con Windows." -ForegroundColor White
 Write-Host "Reglas de firewall configuradas para acceso remoto." -ForegroundColor White
