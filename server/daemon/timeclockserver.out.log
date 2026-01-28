@@ -5,20 +5,32 @@ Captures Directory: D:\Trabajo\Ponchador\ponchador-service\PONCHADOR RM\server\c
 ✓ HTTPS Server Started Successfully
 ========================================
 Port: 3000
-Time: 27/1/2026, 11:59:48 a. m.
+Time: 28/1/2026, 10:05:30 a. m.
 
 Access URLs:
-  Local:    https://localhost:3000
+  Local:    https://192.168.101.103:3000
 ✓ Connected to SQL Server
 ✅ PTORequests table verified
+  Network:  https://192.168.137.1:3000
   Network:  https://192.168.101.103:3000
+  Network:  https://192.168.101.80:3000
 
 Endpoints:
   POST /api/clock  - Clock in/out
   GET  /api/health - Health check
 ========================================
 
-[2026-01-27T17:01:56.423Z] GET /cse.api.v1/GetEmployees from 192.168.101.103
+[2026-01-28T15:08:29.423Z] GET /cse.api.v1/GetEmployees from 192.168.101.103
 Getting employee details for ID: undefined
-[2026-01-27T17:03:06.911Z] GET /cse.api.v1/GetEmployees from 192.168.101.103
+[2026-01-28T15:08:32.932Z] GET /cse.api.v1/GetEmployees from 192.168.101.103
+Getting employee details for ID: undefined
+[2026-01-28T15:08:34.937Z] GET /cse.api.v1/GetEmployees from 192.168.101.103
+Getting employee details for ID: undefined
+[2026-01-28T15:08:35.138Z] GET /cse.api.v1/GetEmployees from 192.168.101.103
+Getting employee details for ID: undefined
+[2026-01-28T15:08:35.375Z] GET /cse.api.v1/GetEmployees from 192.168.101.103
+Getting employee details for ID: undefined
+[2026-01-28T15:08:50.994Z] GET /cse.api.v1/GetEmployees from 192.168.101.103
+Getting employee details for ID: undefined
+[2026-01-28T15:08:52.501Z] GET /cse.api.v1/GetEmployees from 192.168.101.103
 Getting employee details for ID: undefined

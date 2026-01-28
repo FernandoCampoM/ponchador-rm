@@ -548,23 +548,32 @@ async function ensurePTORequestsTable() {
 // --- DETECCIÓN DE IP (Lógica mejorada de tu script) ---
 function getLocalIP() {
     const interfaces = os.networkInterfaces();
-    const validInterfaces = ['Wi-Fi', 'Ethernet', 'Adaptador de Ethernet', 'Conexión de red inalámbrica'];
     
-    for (let iface in interfaces) {
-        if (validInterfaces.some(name => iface.includes(name))) {
-            for (let alias of interfaces[iface]) {
-                if (alias.family === 'IPv4' && !alias.internal) {
-                    return alias.address;
+    // Definimos el orden de prioridad
+    const priority = ['Ethernet', 'Adaptador de Ethernet', 'Wi-Fi', 'Conexión de red inalámbrica'];
+
+    // 1. Intentar por orden de prioridad
+    for (const type of priority) {
+        for (let iface in interfaces) {
+            if (iface.toLowerCase().includes(type.toLowerCase())) {
+                for (let alias of interfaces[iface]) {
+                    if (alias.family === 'IPv4' && !alias.internal) {
+                        return alias.address;
+                    }
                 }
             }
         }
     }
-    // Fallback por si no detecta nombres estándar
+
+    // 2. Si no encontró ninguna de las anteriores, buscar CUALQUIER IPv4 externa
     for (let iface in interfaces) {
         for (let alias of interfaces[iface]) {
-            if (alias.family === 'IPv4' && !alias.internal) return alias.address;
+            if (alias.family === 'IPv4' && !alias.internal) {
+                return alias.address;
+            }
         }
     }
+
     return "127.0.0.1";
 }
 
@@ -612,7 +621,7 @@ const envContent = `NEXT_PUBLIC_BACKEND_IP=${localIP}`;
 
 fs.writeFileSync(frontendEnvPath, envContent);
 console.log("✅ Archivo .env.local del client actualizado automáticamente.");
-httpsServer.listen(PORT, localIP, async () => {
+httpsServer.listen(PORT, "0.0.0.0", async () => {
     
     console.log('\n========================================');
     console.log('✓ HTTPS Server Started Successfully');
@@ -620,7 +629,7 @@ httpsServer.listen(PORT, localIP, async () => {
     console.log(`Port: ${PORT}`);
     console.log(`Time: ${new Date().toLocaleString()}`);
     console.log('\nAccess URLs:');
-    console.log(`  Local:    https://localhost:${PORT}`);
+    console.log(`  Local:    https://${localIP}:${PORT}`);
     await ensurePTORequestsTable();
 
     // Get network interfaces

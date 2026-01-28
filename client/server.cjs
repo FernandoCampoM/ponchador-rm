@@ -70,30 +70,34 @@ const certFile = path.join(certDir, "cert.pem");
 // --- FUNCIÓN PARA DETECTAR TU IP LOCAL ---
 function getLocalIP() {
     const interfaces = os.networkInterfaces();
-    // Lista de nombres comunes de adaptadores reales
-    const validInterfaces = ['Wi-Fi', 'Ethernet', 'Adaptador de Ethernet', 'Conexión de red inalámbrica'];
     
-    for (let iface in interfaces) {
-        // Solo buscamos en interfaces que no parezcan virtuales
-        if (validInterfaces.some(name => iface.includes(name))) {
-            for (let alias of interfaces[iface]) {
-                if (alias.family === 'IPv4' && !alias.internal) {
-                    return alias.address;
+    // Definimos el orden de prioridad
+    const priority = ['Ethernet', 'Adaptador de Ethernet', 'Wi-Fi', 'Conexión de red inalámbrica'];
+
+    // 1. Intentar por orden de prioridad
+    for (const type of priority) {
+        for (let iface in interfaces) {
+            if (iface.toLowerCase().includes(type.toLowerCase())) {
+                for (let alias of interfaces[iface]) {
+                    if (alias.family === 'IPv4' && !alias.internal) {
+                        return alias.address;
+                    }
                 }
             }
         }
     }
-    // Si no encuentra la "ideal", busca cualquiera que empiece por 192.168.101
+
+    // 2. Si no encontró ninguna de las anteriores, buscar CUALQUIER IPv4 externa
     for (let iface in interfaces) {
         for (let alias of interfaces[iface]) {
-            if (alias.family === 'IPv4' && !alias.internal && alias.address.startsWith('192.168.101')) {
+            if (alias.family === 'IPv4' && !alias.internal) {
                 return alias.address;
             }
         }
     }
+
     return "127.0.0.1";
 }
-
 // --- FUNCIÓN PARA GENERAR CERTIFICADOS ---
 function setupCertificates() {
     if (!fs.existsSync(certDir)) {
@@ -126,7 +130,7 @@ function setupCertificates() {
 
 hostname = getLocalIP();
 const dev = false;
-const app = next({ dev, hostname, port });
+const app = next({ dev, hostname: "0.0.0.0", port });
 const handle = app.getRequestHandler();
 
 const httpsOptions = {
@@ -137,7 +141,7 @@ const httpsOptions = {
 app.prepare().then(() => {
     https.createServer(httpsOptions, (req, res) => {
         handle(req, res);
-    }).listen(port, hostname, () => {
+    }).listen(port, "0.0.0.0", () => {
         console.log(`\n🚀 Servidor funcionando en:`);
         console.log(`   - https://${hostname}:${port}`);
         console.log(`   - https://localhost:${port}`);

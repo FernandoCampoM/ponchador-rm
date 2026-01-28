@@ -120,19 +120,41 @@ if (!(Test-Path $certDir)) {
 $keyFile = Join-Path $certDir "key.pem"
 $certFile = Join-Path $certDir "cert.pem"
 
-# Obtener la IP local (Equivalente a tu variable localIP)
-$localIP = (Get-NetRoute -DestinationPrefix 0.0.0.0/0 | 
-            Get-NetIPAddress -AddressFamily IPv4).IPAddress | Select-Object -First 1
+# Intentar obtener IP de adaptadores con nombres específicos en orden
+# Definimos los patrones de búsqueda
+$prioridades = @("*Ethernet*", "*Wi-Fi*", "*Inalámbrica*")
+$listaIPs = @("localhost", "127.0.0.1") # Empezamos con las básicas
 
-if (-not $localIP) {
-    # Si lo anterior falla, buscamos una que empiece por 192. (común en redes locales)
-    $localIP = (Get-NetIPAddress -AddressFamily IPv4 | 
-                Where-Object { $_.IPAddress -like "192.168.*" }).IPAddress[0]
+foreach ($nombre in $prioridades) {
+    # Buscamos todas las IPs que coincidan con el nombre
+    $ipsEncontradas = Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias $nombre -ErrorAction SilentlyContinue | 
+                      Where-Object { $_.IPAddress -notlike "169.254.*" } | 
+                      Select-Object -ExpandProperty IPAddress
+
+    if ($ipsEncontradas) {
+        foreach ($ip in $ipsEncontradas) {
+            if ($listaIPs -notcontains $ip) {
+                $listaIPs += $ip
+            }
+        }
+    }
 }
-Write-Host "Generando certificados para: localhost, 127.0.0.1, $localIP" -ForegroundColor Cyan
+
+# Fallback: Si la lista solo tiene localhost, buscar la ruta predeterminada
+if ($listaIPs.Count -le 2) {
+    $fallbackIP = (Get-NetRoute -DestinationPrefix 0.0.0.0/0 -ErrorAction SilentlyContinue | 
+                   Get-NetIPAddress -AddressFamily IPv4).IPAddress | Select-Object -First 1
+    if ($fallbackIP -and ($listaIPs -notcontains $fallbackIP)) { $listaIPs += $fallbackIP }
+}
+
+# Convertir la lista en un string separado por espacios para usar con mkcert
+$ipStringParaMkcert = $listaIPs -join " "
+
+Write-Host "IPs detectadas para el certificado: $ipStringParaMkcert" -ForegroundColor Cyan
+Write-Host "Generando certificados para: $ipStringParaMkcert" -ForegroundColor Cyan
 
 # Ejecutar mkcert (Equivalente al execSync)
-& mkcert -key-file "$keyFile" -cert-file "$certFile" localhost 127.0.0.1 $localIP
+& mkcert -key-file "$keyFile" -cert-file "$certFile" $listaIPs
 if ($LASTEXITCODE -ne 0) {
     Write-Host "  [ERROR] Failed to install server dependencies" -ForegroundColor Red
     pause
@@ -188,19 +210,10 @@ if (!(Test-Path $certDir)) {
 $keyFile = Join-Path $certDir "key.pem"
 $certFile = Join-Path $certDir "cert.pem"
 
-# Obtener la IP local (Equivalente a tu variable localIP)
-$localIP = (Get-NetRoute -DestinationPrefix 0.0.0.0/0 | 
-            Get-NetIPAddress -AddressFamily IPv4).IPAddress | Select-Object -First 1
-
-if (-not $localIP) {
-    # Si lo anterior falla, buscamos una que empiece por 192. (común en redes locales)
-    $localIP = (Get-NetIPAddress -AddressFamily IPv4 | 
-                Where-Object { $_.IPAddress -like "192.168.*" }).IPAddress[0]
-}
-Write-Host "Generando certificados para: $localIP" -ForegroundColor Cyan
+Write-Host "Generando certificados de Client para: $ipStringParaMkcert" -ForegroundColor Cyan
 
 # Ejecutar mkcert (Equivalente al execSync)
-& mkcert -key-file "$keyFile" -cert-file "$certFile" localhost 127.0.0.1 $localIP
+& mkcert -key-file "$keyFile" -cert-file "$certFile" $listaIPs
 if ($LASTEXITCODE -ne 0) {
     Write-Host "  [ERROR] Failed to install client dependencies" -ForegroundColor Red
     pause
@@ -254,15 +267,6 @@ else {
     Write-Host "  [WARNING] TimeClockClient status: $($clientService.Status)" -ForegroundColor Yellow
 }
 
-$localIP = (Get-NetRoute -DestinationPrefix 0.0.0.0/0 | 
-            Get-NetIPAddress -AddressFamily IPv4).IPAddress | Select-Object -First 1
-
-if (-not $localIP) {
-    # Si lo anterior falla, buscamos una que empiece por 192. (común en redes locales)
-    $localIP = (Get-NetIPAddress -AddressFamily IPv4 | 
-                Where-Object { $_.IPAddress -like "192.168.*" }).IPAddress[0]
-}
-if (-not $localIP) { $localIP = "localhost" } # Fallback si no hay red
 
 # Instalación Completada
 Write-Host ""
