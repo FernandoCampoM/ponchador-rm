@@ -1,8 +1,20 @@
 import axios from "axios"
-import api, { apiCalendar } from "./api";
+import api, { apiServer } from "./api";
 import { GetScheduleCalendarParams, ScheduleCalendar } from "@/lib/types";
 
+/**
+ * Convierte un string "yyyy-MM-dd HH:mm:ss" a Date 
+ * sin aplicar conversiones de zona horaria local.
+ */
+const parseRawDate = (dateStr: string): Date => {
+  const [datePart, timePart] = dateStr.split('T');
+  const [year, month, day] = datePart.split('-').map(Number);
+  console.log("Parsing date:", datePart, "time:", timePart);
+  const [hour, minute, second] = timePart.split(':').map(Number);
 
+  // El mes en JS es 0-indexado (0 = Enero, 11 = Diciembre)
+  return new Date(year, month - 1, day, hour, minute, second || 0);
+};
 
 export const getScheduleCalendar = async (
   params?: GetScheduleCalendarParams
@@ -15,16 +27,16 @@ export const getScheduleCalendar = async (
     if(params?.endDate){
         paramsS+="&endDate="+params.endDate;
     }
-    const { data } = await apiCalendar.get("/schedule/all?"+paramsS, {
+    const { data } = await apiServer.get("/schedule/all?"+paramsS, {
 
     })
-
+    console.log("Fetched schedule calendar data:", data);
     // 🔁 Convertir LocalDateTime (string) → Date
     return data.map((ev: { id: any; title: any; dateStart: string; dateEnd: string; color: any; employeeID: any; }) => ({
         id: ev.id,
         title: ev.title,
-        dateStart: new Date(ev.dateStart.replace(" ", "T")),
-        dateEnd: new Date(ev.dateEnd.replace(" ", "T")),
+        dateStart: parseRawDate(ev.dateStart),
+        dateEnd: parseRawDate(ev.dateEnd),
         color: ev.color || "#0d6efd",   // Color por defecto si no se proporciona
         employeeID: ev.employeeID
     }));

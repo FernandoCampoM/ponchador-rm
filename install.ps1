@@ -266,8 +266,6 @@ if ($clientService -and $clientService.Status -eq "Running") {
 else {
     Write-Host "  [WARNING] TimeClockClient status: $($clientService.Status)" -ForegroundColor Yellow
 }
-
-
 # Instalación Completada
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan

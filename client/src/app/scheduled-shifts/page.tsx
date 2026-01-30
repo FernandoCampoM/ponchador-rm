@@ -23,8 +23,15 @@ import { Button } from "@/components/ui/button"
 export const dynamic = "force-dynamic";
 const toDate = (d: string) => new Date(d.replace(" ", "T"))
 
-const formatTime = (d: Date) =>
-  d.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })
+const formatTime = (d: Date) => {
+  console.log("Formatting time for date:", d);
+  // Al no pasar un locale, el motor de JS usa el del sistema operativo del cliente
+  return new Intl.DateTimeFormat(undefined, {
+    hour: "2-digit",
+    minute: "2-digit",
+    // hour12: undefined // Deja que el país decida si usa 12h o 24h
+  }).format(d);
+};
 
 const formatDay = (d: string) => {
   const [year, month, day] = d.split("-").map(Number)
@@ -75,6 +82,7 @@ useEffect(() => {
         start.setHours(0, 0, 0, 0)
         return start >= today
       })
+      console.log("Turnos programados próximos:", upcoming);
       setShifts(upcoming);
     })
     .catch(console.error)

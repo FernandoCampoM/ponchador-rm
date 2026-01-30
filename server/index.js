@@ -545,6 +545,65 @@ async function ensurePTORequestsTable() {
         throw err;
     }
 }
+// Retail Manager API - Get Schedule Calendar (Match Java DTO)
+app.get('/cse.api.v1/schedule/all', async (req, res) => {
+    const { employeeId } = req.query;
+
+    try {
+        const pool = await sql.connect(dbConfig);
+        let request = pool.request();
+
+        let query = `
+            SELECT 
+                id,
+                title,
+                dateStart,
+                dateEnd,
+                color,
+                employeeID
+            FROM [dbo].[ScheduleCalendar]
+        `;
+
+        if (employeeId) {
+            query += ' WHERE employeeID = @employeeId';
+            request.input('employeeId', sql.BigInt, employeeId);
+        }
+
+        const result = await request.query(query);
+
+        // Mapeo manual para replicar el ScheduleCalendarDTO de Java
+        const listScheduleCalendarDTO = result.recordset.map(item => {
+            return {
+                id: item.id,
+                title: item.title,
+                
+                dateStart: item.dateStart,
+                dateEnd: item.dateEnd,
+                color: item.color,
+                employeeID: item.employeeID
+            };
+        });
+
+        res.json(listScheduleCalendarDTO);
+
+    } catch (err) {
+        console.error('Get schedule error:', err);
+        res.status(500).json({ success: false, message: 'Database error' });
+    }
+});
+
+/**
+ * Función auxiliar para formatear LocalDateTime como en el DTO de Java
+ * pattern = "yyyy-MM-dd HH:mm:ss"
+ */
+function formatDate(date) {
+    if (!date) return null;
+    const d = new Date(date);
+    const pad = (n) => n.toString().padStart(2, '0');
+    
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ` +
+           `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
 // --- DETECCIÓN DE IP (Lógica mejorada de tu script) ---
 function getLocalIP() {
     const interfaces = os.networkInterfaces();

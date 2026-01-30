@@ -7,12 +7,7 @@ let localIP = process.env.NEXT_PUBLIC_BACKEND_IP || "127.0.0.1";
 
 console.log("Using local IP:", localIP);
 export const urlServer = "https://" + localIP + ":3000/cse.api.v1";
-export const apiCalendar = axios.create({
-  baseURL: "http://" + localIP + ":9192/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+
 
 const api = axios.create({
   baseURL: "https://" + localIP + ":3000/cse.api.v1",
