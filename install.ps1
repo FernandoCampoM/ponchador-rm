@@ -128,9 +128,11 @@ $listaIPs = @("localhost", "127.0.0.1") # Empezamos con las básicas
 foreach ($nombre in $prioridades) {
     # Buscamos todas las IPs que coincidan con el nombre
     $ipsEncontradas = Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias $nombre -ErrorAction SilentlyContinue | 
-                      Where-Object { $_.IPAddress -notlike "169.254.*" } | 
+                      Where-Object { $_.IPAddress -notlike "169.254.*" -and
+    $_.AddressState -ne "Deprecated"} | 
                       Select-Object -ExpandProperty IPAddress
-
+    Write-Host "Buscando adaptadores con nombre: $nombre" -ForegroundColor Gray
+    Write-Host "Encontradas IPs para: $ipsEncontradas" -ForegroundColor Gray
     if ($ipsEncontradas) {
         foreach ($ip in $ipsEncontradas) {
             if ($listaIPs -notcontains $ip) {
@@ -139,6 +141,7 @@ foreach ($nombre in $prioridades) {
         }
     }
 }
+
 
 # Fallback: Si la lista solo tiene localhost, buscar la ruta predeterminada
 if ($listaIPs.Count -le 2) {

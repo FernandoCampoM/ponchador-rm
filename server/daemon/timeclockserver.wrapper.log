@@ -1,0 +1,2 @@
+2026-01-30 20:04:23 - Starting C:\nodejs\node.exe  --harmony --max_old_space_size=4096 D:\Trabajo\Ponchador\ponchador-service\PONCHADOR-RM\server\node_modules\node-windows\lib\wrapper.js --file D:\Trabajo\Ponchador\ponchador-service\PONCHADOR-RM\server\index.js --scriptoptions= --log "TimeClockServer wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
+2026-01-30 20:04:23 - Started 8812
