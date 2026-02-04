@@ -1,8 +1,9 @@
 "use client";
 
+import Image from 'next/image';
 import { useEffect, useState, useRef, useCallback, useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
-import { LogIn, LogOut, Loader2, Hash, Asterisk, ArrowRight } from 'lucide-react';
+import { LogIn, LogOut, Loader2, Hash, Asterisk, ArrowRight, Link, BarChart, CalendarPlus } from 'lucide-react';
 import { handleClockAction, type ClockState } from '@/app/actions';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -15,8 +16,52 @@ import { User } from '@/lib/types';
 import employeeStore from '@/lib/mock-data';
 import { useCamera } from '@/hooks/camera';
 import { PTORequestDialog } from './pto-request-dialog';
+import { useRouter } from 'next/navigation';
 
+export default function ViewScheduledShifts() {
+  const router = useRouter()
 
+  useEffect(() => {
+    router.prefetch("/scheduled-shifts")
+  }, [router])
+
+  return (
+    <Button
+      className="w-full py-6 mt-2 flex items-center gap-2 text-lg text-black" variant="orange"
+      onClick={() => router.push("/scheduled-shifts")}
+    >
+      <Image
+    src="/icons/calendar.png"
+    alt="Scheduled shifts"
+    width={40}
+    height={40}
+  />
+      
+    </Button>
+  )
+}
+export function ViewReports() {
+  const router = useRouter()
+
+  useEffect(() => {
+    router.prefetch("/dashboard")
+  }, [router])
+
+   return (
+    <Button
+      className="w-full py-6 mt-2 flex items-center gap-2 text-lg text-black" variant="yellowBright"
+      onClick={() => router.push("/dashboard")}
+    >
+      <Image
+    src="/icons/report.png"
+    alt="Dashboard"
+    width={40}
+    height={40}
+  />
+      
+    </Button>
+  )
+}
 const initialState: ClockState = {
   status: 'idle',
   message: '',
@@ -382,7 +427,19 @@ const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                   <Button type="button" className="w-full text-lg py-6" onClick={handleNext}>
                 Next <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <PTORequestDialog />
+              <div className="flex flex-row md:flex-row gap-1 md:gap-4 w-full max-w-full overflow-hidden">
+  <div className="flex-1 min-w-0">
+    <PTORequestDialog />
+    
+  </div>
+  <div className="flex-1 min-w-0">
+    <ViewScheduledShifts />
+    
+  </div>
+  <div className="flex-1 min-w-0">
+    <ViewReports />
+  </div>
+</div>
               </div>
             ) : (
                 <div className="flex gap-4">

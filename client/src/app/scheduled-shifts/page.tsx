@@ -18,6 +18,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
+// o en Pages Router: import { useRouter } from "next/router"
+
 
 
 export const dynamic = "force-dynamic";
@@ -62,7 +65,10 @@ function getNameUser(employees: User[], employeeID: string): string {
   return employee ? `${employee.Name}` : "Desconocido";
 }
 export default function ScheduledShiftsPage() {
+  const router = useRouter()
+  const [activeInput, setActiveInput] = useState<'userId' | 'pin'>('userId');
   const [isAuthOpen, setIsAuthOpen] = useState(true)
+  const [step, setStep] = useState<'userId' | 'pin'>('userId');
 const [userId, setUserId] = useState("")
 const [pin, setPin] = useState("")
 const [currentUser, setCurrentUser] = useState<User | null>(null)
@@ -124,6 +130,9 @@ const weeklyMinutes = shifts.reduce((total, s) => {
 const handleValidate = async () => {
   const response = await validateUser(Number(userId), pin)
 
+
+
+  
   if (!response.success) {
     toast({
       variant: "destructive",
@@ -136,9 +145,37 @@ const handleValidate = async () => {
     setIsAuthOpen(false)
   }
 }
+const handleKeypadClick = (key: string) => {
+    
+    if (activeInput === 'userId') {
+      setUserId(prev => (prev + key).slice(0, 10));
+    } else {
+      setPin(prev => (prev + key).slice(0, 10));
+    }
+  };
+const handleBackspace = () => {
+     
+    if (activeInput === 'userId') {
+      setUserId(prev => prev.slice(0, -1));
+    } else {
+      setPin(prev => prev.slice(0, -1));
+    }
+  };
+  
+  const handleClear = () => {
+    
+    if (activeInput === 'userId') setUserId('');
+    else setPin('');
+  }
+const keypadKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', '0', '⌫'];
   return (
     <>
-    <Dialog open={isAuthOpen}>
+    <Dialog open={isAuthOpen}
+  onOpenChange={(open) => {
+        if (!open) {
+          router.back()
+        }
+      }}>
   <DialogContent>
     <DialogHeader>
       <DialogTitle>Ver turnos programados</DialogTitle>
@@ -149,6 +186,7 @@ const handleValidate = async () => {
         <Label>User ID</Label>
         <Input
           value={userId}
+          onFocus={() => setActiveInput('userId')}
           onChange={(e) => setUserId(e.target.value)}
         />
       </div>
@@ -157,11 +195,28 @@ const handleValidate = async () => {
         <Label>PIN</Label>
         <Input
           type="password"
+          onFocus={() => setActiveInput('pin')}
           value={pin}
           onChange={(e) => setPin(e.target.value)}
         />
       </div>
-
+      <div className="grid grid-cols-3 gap-2 my-6">
+              {keypadKeys.map((key) => (
+                <Button
+                  key={key}
+                  type="button"
+                  variant="outline"
+                  className="text-2xl h-16"
+                  onClick={() => {
+                    if (key === 'C') handleClear();
+                    else if (key === '⌫') handleBackspace();
+                    else handleKeypadClick(key);
+                  }}
+                >
+                  {key}
+                </Button>
+              ))}
+            </div>
       <Button className="w-full" onClick={handleValidate}>
         Ingresar
       </Button>

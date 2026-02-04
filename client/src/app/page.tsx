@@ -26,14 +26,7 @@ export default function Home() {
         </div>
       </div>
       <footer className="absolute bottom-4 right-4">
-        <Link href="/scheduled-shifts" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
-          <BarChart className="h-5 w-5" />
-          <span>View Scheduled Shifts</span>
-        </Link>
-        <Link href="/dashboard" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
-          <BarChart className="h-5 w-5" />
-          <span>View Reports</span>
-        </Link>
+        
       </footer>
     </main>
   );

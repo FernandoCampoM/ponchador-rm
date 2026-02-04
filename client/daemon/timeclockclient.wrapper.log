@@ -1,2 +1,16 @@
 2026-01-30 20:06:07 - Starting C:\nodejs\node.exe  --max_old_space_size=4096 D:\Trabajo\Ponchador\ponchador-service\PONCHADOR-RM\client\node_modules\node-windows\lib\wrapper.js --file D:\Trabajo\Ponchador\ponchador-service\PONCHADOR-RM\client\server.cjs --scriptoptions= --log "TimeClockClient wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
 2026-01-30 20:06:07 - Started 28188
+2026-02-04 01:17:11 - Stopping timeclockclient.exe
+2026-02-04 01:17:11 - ProcessKill 28188
+2026-02-04 01:17:11 - Found child process: 37128 Name: conhost.exe
+2026-02-04 01:17:11 - Found child process: 37124 Name: node.exe
+2026-02-04 01:17:12 - Stopping process 37128
+2026-02-04 01:17:12 - Send SIGINT 37128
+2026-02-04 01:17:12 - SIGINT to 37128 failed - Killing as fallback
+2026-02-04 01:17:12 - Stopping process 37124
+2026-02-04 01:17:12 - Send SIGINT 37124
+2026-02-04 01:17:12 - SIGINT to 37124 failed - Killing as fallback
+2026-02-04 01:17:12 - Stopping process 28188
+2026-02-04 01:17:12 - Send SIGINT 28188
+2026-02-04 01:17:12 - SIGINT to 28188 failed - Killing as fallback
+2026-02-04 01:17:12 - Finished timeclockclient.exe
